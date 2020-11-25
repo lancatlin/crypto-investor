@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, List
 from enum import Enum, auto
 from binance.client import Client
 from os import environ
@@ -20,13 +20,14 @@ class Binance:
         info = self.client.get_account()
         return info['balances']
     
-    def assets(self):
+    def assets(self) -> List[str]:
         return [v['asset'] for v in self.get_balances() if float(v['free']) + float(v['locked']) != 0]
 
-def all_symbols(currencies):
-    result = tuple(f"{i}{j}" for i in currencies for j in currencies if i != j)
-    print(result)
-    return result
+    def exchange_info(self):
+        return [v for v in all_symbols(self.assets()) if self.client.get_symbol_info(v) is not None]
+
+def all_symbols(currencies: List[str]):
+    return tuple(f"{i}{j}" for i in currencies for j in currencies if i != j)
 
 class Record:
     id: int = 0
@@ -52,5 +53,6 @@ my_currencies = ['BTC', 'ETH', 'LTC', 'EOS', 'XRP', 'USDC', 'USDT']
 
 if __name__ == "__main__":
     client = Binance(environ.get("API_KEY"), environ.get("API_SECRET"))
+    print(client.exchange_info())
     print(client.assets())
-    print([str(v) for v in client.get_orders(sys.argv[1])])
+    #print([str(v) for v in client.get_orders(sys.argv[1])])
