@@ -1,12 +1,6 @@
 from typing import Dict, List, Optional, Generator
-from enum import Enum, auto
 from binance.client import Client # type: ignore
-from os import environ
-from dotenv import load_dotenv
-import sys
-from record import Record
-
-load_dotenv()
+from web.models import Record
 
 class Binance:
     client = Client
@@ -38,8 +32,3 @@ class Binance:
 
 def all_symbols(currencies: List[str]):
     return tuple(f"{i}{j}" for i in currencies for j in currencies if i != j)
-
-if __name__ == "__main__":
-    client = Binance(environ.get("API_KEY"), environ.get("API_SECRET"))
-    for record in client.records():
-        print(record)
