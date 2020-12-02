@@ -5,6 +5,12 @@
     </head>
     <body>
         <header>
+            {% if request.user.is_authenticated %}
+            Welcome {{ request.user.username }}
+            <a href="/logout">Logout</a>
+            {% else %}
+            <a href="/login">Login</a>
+            {% endif %}
         </header>
         <main>
             {% block content %}
