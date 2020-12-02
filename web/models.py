@@ -1,9 +1,18 @@
 # Create your models here.
 from typing import Dict
 from django.db import models
+from django.contrib.auth.models import AbstractUser
+from django.conf import settings
+
+class User(AbstractUser):
+    api_key = models.CharField(max_length=128)
+    api_secret = models.CharField(max_length=128)
 
 class Record(models.Model):
-    id: int = models.PositiveIntegerField(primary_key=True)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+    )
     isSell: bool = models.BooleanField()
     symbol: str = models.CharField(max_length=64)
     executed_qty: float = models.FloatField()
