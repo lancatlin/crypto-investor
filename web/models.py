@@ -3,10 +3,21 @@ from typing import Dict
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
+#from .binance_client import Binance
 
 class User(AbstractUser):
     api_key = models.CharField(max_length=128)
     api_secret = models.CharField(max_length=128)
+    #client: Binance = None
+
+    def __init__(self):
+        super()
+        #self.client = Binance(self.api_key, self.api_secret)
+
+    def reload_orders(self):
+        for record in self.client.records():
+            record.user = self
+            #Record.objects.update_or_create(record)
 
 class Record(models.Model):
     user = models.ForeignKey(
