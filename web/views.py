@@ -1,15 +1,25 @@
 from django.shortcuts import render
-from .forms import LoginForm
 from django.contrib import auth
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpRequest, StreamingHttpResponse
+from django.contrib.auth.decorators import login_required
+from .forms import LoginForm
+from .binance_client import Binance
+from .models import User
 
 # Create your views here.
 
-def index(request):
+def index(request: HttpRequest):
     return render(request, 'index.html')
 
-def reload_orders(request):
-    pass 
+@login_required
+def reload_orders(request: HttpRequest):
+    return StreamingHttpResponse(load_orders(request.user))
+
+def load_orders(user: User):
+    client  = Binance(user) 
+    for record in client.records():
+        record.save()
+        yield str(record)
 
 def login(request):
     if request.method != 'POST':

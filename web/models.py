@@ -10,7 +10,7 @@ class User(AbstractUser):
     api_secret = models.CharField(max_length=128)
 
 class Record(models.Model):
-    user = models.ForeignKey(
+    user = medels.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
     )

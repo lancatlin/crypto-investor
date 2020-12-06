@@ -3,9 +3,9 @@ from binance.client import Client # type: ignore
 from web.models import Record, User
 
 class Binance:
-    client: Client
-    __symbols: List[str]
-    user: User
+    client: Client = None
+    __symbols: List[str] = None
+    user: User = None
 
     def __init__(self, user: User):
         self.user = user
