@@ -14,7 +14,7 @@ class Record(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
     )
-    isSell: bool = models.BooleanField()
+    is_sell: bool = models.BooleanField()
     symbol: str = models.CharField(max_length=64)
     executed_qty: float = models.FloatField()
     cummulative_quote_qty: float = models.FloatField()

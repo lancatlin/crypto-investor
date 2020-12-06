@@ -3,5 +3,25 @@
 {% block title %}Records{% endblock %}
 
 {% block content %}
-<h1>Test title</h1>
+<h1>我的交易紀錄</h1>
+<table>
+    <tr>
+        <td>交易對</td>
+        <td>交易時間</td>
+        <td>方向</td>
+        <td>交易金額</td>
+        <td>交易量（商品）</td>
+        <td>交易量（貨幣）</td>
+    </tr>
+    {% for record in records %}
+    <tr>
+        <td>{{ record.symbol }}</td>
+        <td>{{ record.time }}</td>
+        <td>{{ record.is_sell }}</td>
+        <td>{{ record.price }}</td>
+        <td>{{ record.executed_qty }}</td>
+        <td>{{ record.cummulative_quote_qty }}</td>
+    </tr>
+    {% endfor %}
+</table>
 {% endblock %}

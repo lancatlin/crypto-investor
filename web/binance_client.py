@@ -39,7 +39,7 @@ class Binance:
 
     def create_record(self, table: Dict[str, str]) -> Record:
         updates = {
-            'isSell': table['side'] == 'SELL',
+            'is_sell': table['side'] == 'SELL',
             'symbol': table['symbol'],
             'executed_qty': float(table['executedQty']),
             'cummulative_quote_qty': float(table['cummulativeQuoteQty']),

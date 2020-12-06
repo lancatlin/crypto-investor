@@ -4,7 +4,7 @@ from django.http import HttpResponseRedirect, HttpRequest, StreamingHttpResponse
 from django.contrib.auth.decorators import login_required
 from .forms import LoginForm
 from .binance_client import Binance
-from .models import User
+from .models import User, Record
 
 # Create your views here.
 
@@ -40,3 +40,8 @@ def login(request):
 def logout(request):
     auth.logout(request)
     return HttpResponseRedirect('/')
+
+@login_required
+def records_list(request: HttpRequest):
+    user = request.user
+    return render(request, 'records.html', {'records': Record.objects.all().filter(user=user)})
