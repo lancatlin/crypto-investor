@@ -16,10 +16,11 @@ def reload_orders(request: HttpRequest):
     return StreamingHttpResponse(load_orders(request.user))
 
 def load_orders(user: User):
-    client  = Binance(user) 
-    for record in client.records():
-        record.save()
-        yield str(record)
+    client = Binance(user) 
+    for record, created in client.records():
+        if not created:
+            record.save()
+            yield f"{record.time}\n"
 
 def login(request):
     if request.method != 'POST':

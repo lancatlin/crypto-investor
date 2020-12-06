@@ -1,6 +1,7 @@
-from typing import Dict, List, Generator
+from typing import Dict, List, Generator, Tuple
 from binance.client import Client # type: ignore
 from web.models import Record, User
+from datetime import datetime, timezone
 
 class Binance:
     client: Client = None
@@ -11,13 +12,10 @@ class Binance:
         self.user = user
         self.client = Client(user.api_key, user.api_secret)
 
-    def get_orders(self, symbol: str):
-        data = self.client.get_all_orders(symbol=symbol)
-        return [self.create_record(v) for v in data if v['status'] == 'FILLED']
-
-    def assets(self) -> List[str]:
-        return [v['asset'] for v in self.client.get_account()['balances'] \
-            if float(v['free']) + float(v['locked']) != 0]
+    def records(self) -> Generator[Tuple[Record, bool], None, None]:
+        for symbol in self.symbols():
+            for r in self.get_orders(symbol):
+                yield r
 
     def symbols(self) -> Generator[str, None, None]:
         if self.__symbols is not None:
@@ -31,19 +29,26 @@ class Binance:
                 yield v
         self.__symbols = symbols
 
-    def records(self) -> Generator[Record, None, None]:
-        for symbol in self.symbols():
-            for r in self.get_orders(symbol):
-                yield r
+    def assets(self) -> List[str]:
+        return [v['asset'] for v in self.client.get_account()['balances'] \
+            if float(v['free']) + float(v['locked']) != 0]
+
+    def get_orders(self, symbol: str) -> List[Tuple[Record, bool]]:
+        data = self.client.get_all_orders(symbol=symbol)
+        return [self.create_record(v) for v in data if v['status'] == 'FILLED']
 
     def create_record(self, table: Dict[str, str]) -> Record:
-        return Record.objects.create(
+        updates = {
+            'isSell': table['side'] == 'SELL',
+            'symbol': table['symbol'],
+            'executed_qty': float(table['executedQty']),
+            'cummulative_quote_qty': float(table['cummulativeQuoteQty']),
+            'user': self.user,
+            'time': datetime.fromtimestamp(int(table['time']) / 1000, tz=timezone.utc),
+        }
+        return Record.objects.get_or_create(
             id = int(table['orderId']),
-            isSell = table['side'] == 'SELL',
-            symbol = table['symbol'],
-            executed_qty = float(table['executedQty']),
-            cummulative_quote_qty = float(table['cummulativeQuoteQty']),
-            user=self.user,
+            defaults=updates,
         )
 
 def all_symbols(currencies: List[str]):

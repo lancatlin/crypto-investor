@@ -10,7 +10,7 @@ class User(AbstractUser):
     api_secret = models.CharField(max_length=128)
 
 class Record(models.Model):
-    user = medels.ForeignKey(
+    user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
     )
@@ -18,6 +18,7 @@ class Record(models.Model):
     symbol: str = models.CharField(max_length=64)
     executed_qty: float = models.FloatField()
     cummulative_quote_qty: float = models.FloatField()
+    time = models.DateTimeField()
 
     def price(self) -> float:
         return self.cummulative_quote_qty / self.executed_qty
