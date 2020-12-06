@@ -9,6 +9,7 @@ python-binance = "*"
 
 [dev-packages]
 mypy = "*"
+pylint-django = "*"
 
 [requires]
 python_version = "3.9"

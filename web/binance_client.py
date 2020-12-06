@@ -1,17 +1,19 @@
-from typing import Dict, List, Optional, Generator
+from typing import Dict, List, Generator
 from binance.client import Client # type: ignore
-from web.models import Record
+from web.models import Record, User
 
 class Binance:
-    client: Client = None
-    __symbols: Optional[List[str]] = None
+    client: Client
+    __symbols: List[str]
+    user: User
 
-    def __init__(self, api_key: Optional[str], api_secret: Optional[str]):
-        self.client = Client(api_key, api_secret)
+    def __init__(self, user: User):
+        self.user = user
+        self.client = Client(user.api_key, user.api_secret)
 
     def get_orders(self, symbol: str):
         data = self.client.get_all_orders(symbol=symbol)
-        return [Record(v) for v in data if v['status'] == 'FILLED']
+        return [self.create_record(v) for v in data if v['status'] == 'FILLED']
 
     def assets(self) -> List[str]:
         return [v['asset'] for v in self.client.get_account()['balances'] \
@@ -34,6 +36,15 @@ class Binance:
             for r in self.get_orders(symbol):
                 yield r
 
+    def create_record(self, table: Dict[str, str]) -> Record:
+        return Record.objects.create(
+            id = int(table['orderId']),
+            isSell = table['side'] == 'SELL',
+            symbol = table['symbol'],
+            executed_qty = float(table['executedQty']),
+            cummulative_quote_qty = float(table['cummulativeQuoteQty']),
+            user=self.user,
+        )
 
 def all_symbols(currencies: List[str]):
     return tuple(f"{i}{j}" for i in currencies for j in currencies if i != j)
