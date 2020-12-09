@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Records{% endblock %}
+
+{% block content %}
+<h1>我的交易紀錄</h1>
+<table>
+    <tr>
+        <td>交易對</td>
+        <td>交易時間</td>
+        <td>方向</td>
+        <td>價格</td>
+        <td>交易量（商品）</td>
+        <td>交易量（貨幣）</td>
+    </tr>
+    {% for record in record_list %}
+    <tr>
+        <td>{{ record.symbol }}</td>
+        <td>{{ record.time }}</td>
+        <td>{% if record.is_sell %}賣出{% else %}買入{% endif %}</td>
+        <td>{{ record.price }}</td>
+        <td>{{ record.executed_qty }}</td>
+        <td>{{ record.cummulative_quote_qty }}</td>
+    </tr>
+    {% endfor %}
+</table>
+<div class="pagination">
+    <span class="step-links">
+        {% if page_obj.has_previous %}
+            <a href="?page=1">&laquo; first</a>
+            <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+        </span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+        {% endif %}
+    </span>
+</div>
+{% endblock %}

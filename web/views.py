@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.contrib import auth
 from django.http import HttpResponseRedirect, HttpRequest, StreamingHttpResponse
 from django.contrib.auth.decorators import login_required
+from django.views import generic
 from .forms import LoginForm
 from .binance_client import Binance
 from .models import User, Record
@@ -41,7 +42,9 @@ def logout(request):
     auth.logout(request)
     return HttpResponseRedirect('/')
 
-@login_required
-def records_list(request: HttpRequest):
-    user = request.user
-    return render(request, 'records.html', {'records': Record.objects.all().filter(user=user)})
+class RecordList(generic.ListView):
+    model = Record
+    paginate_by = 20
+    
+    def get_queryset(self):
+        return Record.objects.filter(user=self.request.user).order_by('time')

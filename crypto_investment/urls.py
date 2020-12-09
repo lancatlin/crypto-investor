@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from web.views import index, login, logout, reload_orders, records_list
+from web.views import index, login, logout, reload_orders, RecordList
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -23,5 +23,5 @@ urlpatterns = [
     path('login', login),
     path('logout', logout),
     path('reload', reload_orders),
-    path('records', records_list),
+    path('records', RecordList.as_view()),
 ]
