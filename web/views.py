@@ -21,7 +21,7 @@ def load_orders(user: User):
     for record, created in client.records():
         if not created:
             record.save()
-            yield f"{record.time}\n"
+        yield f"{record.time}<br>"
 
 def login(request):
     if request.method != 'POST':
