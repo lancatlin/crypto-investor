@@ -35,12 +35,16 @@ class Profit:
     currencies: Dict[str, float] = {}
 
     def __init__(self, cost, income, currencies, prices):
-        self.cost = cost
-        self.income = income
+        value = [
+            sum([v * prices(k) for k, v in currencies.items() if v > 0]),
+            sum([-v * prices(k) for k, v in currencies.items() if v < 0]),
+        ]
+        self.cost = cost + value[1]
+        self.income = income + value[0]
         self.currencies = currencies
-        self.value = sum([currencies[k] * prices(k) for k in currencies])
-        self.profit = income - cost + self.value
-        self.rate = self.profit / cost * 100
+        self.value = sum(value)
+        self.profit = self.income - self.cost
+        self.rate = self.income / self.cost * 100 - 100
 
 def calculate_profit(records: List[Record], prices: Callable[[str], float]) -> Profit:
     cost: float = 0

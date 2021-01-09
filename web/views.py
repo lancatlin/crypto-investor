@@ -6,6 +6,7 @@ from django.views import generic
 from .forms import LoginForm, RecordFilterForm
 from .binance_client import Binance
 from .models import User, Record, calculate_profit
+from datetime import datetime, timezone, timedelta
 
 # Create your views here.
 
@@ -57,7 +58,7 @@ class RecordList(generic.ListView):
             if form['start'] is not None:
                 tx = tx.filter(time__gt=form['start'])
             if form['end'] is not None:
-                tx = tx.filter(time__lt=form['end'])
+                tx = tx.filter(time__lt=form['end'] + timedelta(days=1))
 
         return tx
     
