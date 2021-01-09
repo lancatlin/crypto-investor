@@ -49,9 +49,16 @@ class RecordList(generic.ListView):
     def get_queryset(self):
         tx = Record.objects.filter(user=self.request.user).order_by('-time')
         form = RecordFilterForm(self.request.GET or None)
-        if form.is_valid() and form.cleaned_data['symbol'] != '':
-            print(form.cleaned_data)
-            tx = tx.filter(symbol__contains=form.cleaned_data['symbol'])
+        if form.is_valid() :
+            form = form.cleaned_data
+            print(form)
+            if form['symbol'] != '':
+                tx = tx.filter(symbol__contains=form['symbol'])
+            if form['start'] is not None:
+                tx = tx.filter(time__gt=form['start'])
+            if form['end'] is not None:
+                tx = tx.filter(time__lt=form['end'])
+
         return tx
     
     def get_context_data(self, **kwargs):
