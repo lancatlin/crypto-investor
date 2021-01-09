@@ -42,6 +42,12 @@ class ProfitTest(TestCase):
                 cummulative_quote_qty=18000,
             ),
             self.record(
+                symbol='BTC/ETH',
+                is_sell=True,
+                executed_qty=1,
+                cummulative_quote_qty=40,
+            ),
+            self.record(
                 symbol="ETH/USDC",
                 is_sell=False,
                 executed_qty=1,

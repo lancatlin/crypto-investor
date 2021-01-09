@@ -51,7 +51,7 @@ class RecordList(generic.ListView):
         form = RecordFilterForm(self.request.GET or None)
         if form.is_valid() and form.cleaned_data['symbol'] != '':
             print(form.cleaned_data)
-            tx = tx.filter(symbol=form.cleaned_data['symbol'])
+            tx = tx.filter(symbol__contains=form.cleaned_data['symbol'])
         return tx
     
     def get_context_data(self, **kwargs):

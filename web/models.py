@@ -34,30 +34,39 @@ class Profit:
     rate: float = 0
     currencies: Dict[str, float] = {}
 
-    def __init__(self, cost, income, currencies):
+    def __init__(self, cost, income, currencies, prices):
         self.cost = cost
         self.income = income
-        self.profit = income - cost
-        self.rate = income / cost
         self.currencies = currencies
+        self.value = sum([currencies[k] * prices(k) for k in currencies])
+        self.profit = income - cost + self.value
+        self.rate = self.profit / cost * 100
 
 def calculate_profit(records: List[Record], prices: Callable[[str], float]) -> Profit:
-    cost: Dict[str, float] = {}
-    income: Dict[str, float] = {}
+    cost: float = 0
+    income: float = 0
+    pool: Dict[str, float] = {}
 
     for record in records:
         c: List[str] = record.symbol.split('/', 2)
-        for k in c:
-            cost.setdefault(k, 0)
-            income.setdefault(k, 0)
+        if all(is_coin(k) for k in c):
+            # omit stable coin to stable coin
+            continue
+        [pool.setdefault(k, 0) for k in c if not is_coin(k)]
         if not record.is_sell:
-            income[c[0]] += record.executed_qty
-            cost[c[1]] += record.cummulative_quote_qty
+            pool[c[0]] += record.executed_qty
+            if is_coin(c[1]):
+                cost += record.cummulative_quote_qty
+            else:
+                pool[c[1]] -= record.cummulative_quote_qty
         else:
-            income[c[0]] -= record.executed_qty
-            income[c[1]] += record.cummulative_quote_qty
+            pool[c[0]] -= record.executed_qty
+            if is_coin(c[1]):
+                income += record.cummulative_quote_qty
+            else:
+                pool[c[1]] += record.cummulative_quote_qty
     
-    total_cost = sum([cost[k] * prices(k) for k in cost.keys()])
-    total_value = sum([income[k] * prices(k) for k in income.keys()])
-    currencies = {k: income[k] - cost[k] for k in cost.keys()}
-    return Profit(total_cost, total_value, currencies)
+    return Profit(cost, income, pool, prices)
+
+def is_coin(c: str) -> bool:
+    return 'USD' in c or c == 'DAI'

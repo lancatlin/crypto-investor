@@ -11,16 +11,18 @@
 <table>
     <tr>
         <th>總成本</th>
-        <th>總收益</th>
+        <th>Selled</th>
+        <th>Value</th>
         <th>總獲利</th>
         <th>投資報酬率</th>
         <th>Currencies</th>
     </tr>
     <tr>
-        <td>{{ profit.cost }}</td>
-        <td>{{ profit.income }}</td>
-        <td>{{ profit.profit }}</td>
-        <td>{{ profit.rate }}</td>
+        <td>{{ profit.cost | floatformat:3 }}</td>
+        <td>{{ profit.income | floatformat:3 }}</td>
+        <td>{{ profit.value | floatformat:3 }}</td>
+        <td>{{ profit.profit | floatformat:3 }}</td>
+        <td>{{ profit.rate | floatformat:2 }}%</td>
         <td>{{ profit.currencies }}</td>
     </tr>
 </table>
