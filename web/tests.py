@@ -2,7 +2,7 @@ from typing import List, Dict
 from django.test import TestCase
 from django.utils import timezone
 from .binance_client import Binance
-from .models import User, Record, Profit, calculate_profit
+from .models import User, Record, calculate_profit
 from dotenv import load_dotenv
 from os import environ
 from datetime import datetime
@@ -62,6 +62,7 @@ class ProfitTest(TestCase):
         )
     
     def test_profit(self):
-        profit = calculate_profit(self.records, self.prices)
+        prices = lambda k: self.prices[k]
+        profit = calculate_profit(self.records, prices)
         print(profit.__dict__)
-        assert profit.profit == 2100, "Profit not correct"
+        assert profit.profit == 2100, 'Profit not correct'

@@ -51,5 +51,13 @@ class Binance:
             defaults=updates,
         )
 
+    def price(self, symbol: str) -> float:
+        print(symbol)
+        try:
+            data = self.client.get_avg_price(symbol=symbol+'USDT')
+            return float(data['price'])
+        except:
+            return 1
+
 def all_symbols(currencies: List[str]):
     return tuple(f"{i}/{j}" for i in currencies for j in currencies if i != j)

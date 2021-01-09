@@ -3,9 +3,9 @@ from django.contrib import auth
 from django.http import HttpResponseRedirect, HttpRequest, StreamingHttpResponse
 from django.contrib.auth.decorators import login_required
 from django.views import generic
-from .forms import LoginForm
+from .forms import LoginForm, RecordFilterForm
 from .binance_client import Binance
-from .models import User, Record
+from .models import User, Record, calculate_profit
 
 # Create your views here.
 
@@ -44,7 +44,18 @@ def logout(request):
 
 class RecordList(generic.ListView):
     model = Record
-    paginate_by = 20
+    #paginate_by = 10
     
     def get_queryset(self):
-        return Record.objects.filter(user=self.request.user).order_by('time')
+        tx = Record.objects.filter(user=self.request.user).order_by('-time')
+        form = RecordFilterForm(self.request.GET or None)
+        if form.is_valid() and form.cleaned_data['symbol'] != '':
+            print(form.cleaned_data)
+            tx = tx.filter(symbol=form.cleaned_data['symbol'])
+        return tx
+    
+    def get_context_data(self, **kwargs):
+        ctx = super(RecordList, self).get_context_data(**kwargs)
+        ctx['profit'] = calculate_profit(self.get_queryset().all(), Binance(self.request.user).price)
+        ctx['form'] = RecordFilterForm(self.request.GET or None)
+        return ctx
