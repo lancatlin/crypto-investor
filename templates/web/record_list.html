@@ -4,6 +4,28 @@
 
 {% block content %}
 <h1>我的交易紀錄</h1>
+<form action="/records" method="get">
+    {{ form }}
+    <input type="submit" value="Submit">
+</form>
+<table>
+    <tr>
+        <th>總成本</th>
+        <th>Selled</th>
+        <th>Value</th>
+        <th>總獲利</th>
+        <th>投資報酬率</th>
+        <th>Currencies</th>
+    </tr>
+    <tr>
+        <td>{{ profit.cost | floatformat:3 }}</td>
+        <td>{{ profit.income | floatformat:3 }}</td>
+        <td>{{ profit.value | floatformat:3 }}</td>
+        <td>{{ profit.profit | floatformat:3 }}</td>
+        <td>{{ profit.rate | floatformat:2 }}%</td>
+        <td>{{ profit.currencies }}</td>
+    </tr>
+</table>
 <table>
     <tr>
         <td>交易對</td>

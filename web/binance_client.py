@@ -24,7 +24,7 @@ class Binance:
             return
         symbols = []
         for v in all_symbols(self.assets()):
-            if self.client.get_symbol_info(v) is not None:
+            if self.client.get_symbol_info(v.replace('/', '')) is not None:
                 symbols.append(v)
                 yield v
         self.__symbols = symbols
@@ -34,13 +34,13 @@ class Binance:
             if float(v['free']) + float(v['locked']) != 0]
 
     def get_orders(self, symbol: str) -> List[Tuple[Record, bool]]:
-        data = self.client.get_all_orders(symbol=symbol)
-        return [self.create_record(v) for v in data if v['status'] == 'FILLED']
+        data = self.client.get_all_orders(symbol=symbol.replace('/', ''))
+        return [self.create_record(v, symbol) for v in data if v['status'] == 'FILLED']
 
-    def create_record(self, table: Dict[str, str]) -> Record:
+    def create_record(self, table: Dict[str, str], symbol: str) -> Record:
         updates = {
             'is_sell': table['side'] == 'SELL',
-            'symbol': table['symbol'],
+            'symbol': symbol,
             'executed_qty': float(table['executedQty']),
             'cummulative_quote_qty': float(table['cummulativeQuoteQty']),
             'user': self.user,
@@ -51,5 +51,13 @@ class Binance:
             defaults=updates,
         )
 
+    def price(self, symbol: str) -> float:
+        print(symbol)
+        try:
+            data = self.client.get_avg_price(symbol=symbol+'USDT')
+            return float(data['price'])
+        except:
+            return 1
+
 def all_symbols(currencies: List[str]):
-    return tuple(f"{i}{j}" for i in currencies for j in currencies if i != j)
+    return tuple(f"{i}/{j}" for i in currencies for j in currencies if i != j)
